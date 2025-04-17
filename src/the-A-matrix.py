@@ -15,7 +15,6 @@ Calculate the matrix element of the following matrix:
    $$
 """
 import argparse
-from collections.abc import Callable
 
 import pdaggerq
 
@@ -26,34 +25,48 @@ def print_banner():
     print('')
 
 
-def verbose_print(terms: list[str]):
+def verbose_print(pq):
+    terms = pq.strings()
     for term in terms:
         print(term)
 
 
-def numpy_print(terms: list[str]):
+def numpy_print(pq):
     from pdaggerq.parser import contracted_strings_to_tensor_terms
+    terms = pq.strings()
     tensor_terms = contracted_strings_to_tensor_terms(terms)
     for my_term in tensor_terms:
         einsum_terms = my_term.einsum_string(
             output_variables=('a', 'i'),
-            update_val='r1_aa',
+            update_val='A_mu_nu',
         )
         print(f"{einsum_terms}")
 
 
-def build_singles_singles() -> list[str]:
+def graph_print(pq, analysis: bool = False):
+    options = {}
+    graph = pdaggerq.pq_graph(options)
+
+    graph.add(pq, "A_mu_nu", ['a', 'b', 'i', 'j'])
+    graph.optimize()
+
+    graph.print('c++')
+
+    if analysis:
+        graph.analysis()
+
+
+def build_singles_singles():
     pq = pdaggerq.pq_helper("fermi")
     pq.add_st_operator(1.0, ['e1(j,b)', 'f', 'e1(a,i)'], ['t1', 't2'])
     pq.add_st_operator(1.0, ['e1(j,b)', 'v', 'e1(a,i)'], ['t1', 't2'])
     pq.add_st_operator(-1.0, ['e1(j,b)', 'e1(a,i)', 'f'], ['t1', 't2'])
     pq.add_st_operator(-1.0, ['e1(j,b)', 'e1(a,i)', 'v'], ['t1', 't2'])
     pq.simplify()
-    terms = pq.strings()
-    return terms
+    return pq
 
 
-def build_doubles_singles() -> list[str]:
+def build_doubles_singles():
     pq = pdaggerq.pq_helper("fermi")
     pq.add_st_operator(1.0, ['e2(j,k,b,c)', 'f', 'e1(a,i)'], ['t1', 't2'])
     pq.add_st_operator(1.0, ['e2(j,k,b,c)', 'v', 'e1(a,i)'], ['t1', 't2'])
@@ -62,7 +75,7 @@ def build_doubles_singles() -> list[str]:
     return pq
 
 
-def build_singles_doubles() -> list[str]:
+def build_singles_doubles():
     pq = pdaggerq.pq_helper("fermi")
     pq.add_st_operator(1.0, ['e1(j,b)', 'f', 'e2(a,c,i,k)'], ['t1', 't2'])
     pq.add_st_operator(1.0, ['e1(j,b)', 'v', 'e2(a,c,i,k)'], ['t1', 't2'])
@@ -73,7 +86,7 @@ def build_singles_doubles() -> list[str]:
     return terms
 
 
-def build_doubles_doubles() -> list[str]:
+def build_doubles_doubles():
     pq = pdaggerq.pq_helper("fermi")
     pq.add_st_operator(1.0, ['e2(k,l,c,d)', 'f', 'e2(a,b,i,j)'], ['t1', 't2'])
     pq.add_st_operator(1.0, ['e2(k,l,c,d)', 'v', 'e2(a,b,i,j)'], ['t1', 't2'])
@@ -94,34 +107,43 @@ def cli() -> argparse.Namespace:
         ' doubles.',
     )
     print_options = parser.add_mutually_exclusive_group()
-    print_options.add_argument('--np', default=False, action='store_true')
+    print_options.add_argument('--graph', default=False, action='store_true')
+    print_options.add_argument('--numpy', default=False, action='store_true')
     print_options.add_argument('--verbose', default=False, action='store_true')
+    parser.add_argument(
+        '--analysis',
+        default=False,
+        action='store_true',
+        help='Only useful with --graph. Print the extra analysis section.'
+    )
     args = parser.parse_args()
     return args
 
 
 def main():
     args = cli()
-    print_np = args.np
-    print_np = True
     
     if args.verbose is True:
         print_banner()
 
-    build_functions: dict[str, Callable[[], list[str]]] = {
+    build_functions = {
         'ss': build_singles_singles,
         'ds': build_doubles_singles,
         'sd': build_singles_doubles,
         'dd': build_doubles_doubles,
     }
     builder = build_functions[args.block]
-    strings = builder()
+    pq = builder()
 
     if args.verbose:
-        verbose_print(strings)
+        verbose_print(pq)
 
-    elif print_np is True:
-        numpy_print(strings)
+    elif args.numpy is True:
+        numpy_print(pq)
+
+    elif args.graph is True:
+        graph_print(pq, analysis=args.analysis)
+
 
 
 if __name__ == "__main__":
