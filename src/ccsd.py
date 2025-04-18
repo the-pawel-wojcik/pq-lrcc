@@ -10,8 +10,17 @@ pq.add_st_operator(1.0, ['f'], ['t1','t2'])
 pq.add_st_operator(1.0, ['v'], ['t1','t2'])
 
 pq.simplify()
-terms = pq.strings()
-for term in terms:
-    print(term)
+
+if False:
+    terms = pq.strings()
+    for term in terms:
+        print(term)
     
-pq.clear()
+if True:
+    options = {}
+    graph = pdaggerq.pq_graph(options)
+
+    graph.add(pq, "E_CC", ['a', 'b', 'i', 'j'])
+    graph.optimize()
+
+    graph.print('c++')
