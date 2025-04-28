@@ -1,5 +1,5 @@
 r"""
-Calculate the matrix element of the following matrix:
+Calculate the matrix element of the CC Jacobian:
    $$
    A _{\mu \nu} 
    =
@@ -38,22 +38,51 @@ def numpy_print(pq):
     for my_term in tensor_terms:
         einsum_terms = my_term.einsum_string(
             output_variables=('a', 'i'),
-            update_val='A_mu_nu',
+            update_val='cc_jacobian',
         )
         print(f"{einsum_terms}")
 
 
-def graph_print(pq, analysis: bool = False):
+def graph_print(pq, block: str, analysis: bool = False):
     options = {}
     graph = pdaggerq.pq_graph(options)
 
-    graph.add(pq, "A_mu_nu", ['a', 'b', 'i', 'j'])
+
+    indices = {
+        'sz': ['i', 'a'],
+        'zs': ['i', 'a'],
+        'ss': ['a', 'b', 'i', 'j'],
+        'sd': [],
+    }
+
+    graph.add(pq, "cc_jacobian", indices[block])
     graph.optimize()
 
     graph.print('c++')
 
     if analysis:
         graph.analysis()
+
+
+def build_zero_singles():
+    pq = pdaggerq.pq_helper("fermi")
+    pq.add_st_operator(1.0, ['f', 'e1(a,i)'], ['t1', 't2'])
+    pq.add_st_operator(1.0, ['v', 'e1(a,i)'], ['t1', 't2'])
+    pq.add_st_operator(-1.0, ['e1(a,i)', 'f'], ['t1', 't2'])
+    pq.add_st_operator(-1.0, ['e1(a,i)', 'v'], ['t1', 't2'])
+    pq.simplify()
+    return pq
+
+
+def build_singles_zero():
+    """ This one should come out as all zeroes. """
+    pq = pdaggerq.pq_helper("fermi")
+    pq.add_st_operator(1.0, ['e1(i,a)', 'f'], ['t1', 't2'])
+    pq.add_st_operator(1.0, ['e1(i,a)', 'v'], ['t1', 't2'])
+    pq.add_st_operator(-1.0, ['e1(i,a)', 'f'], ['t1', 't2'])
+    pq.add_st_operator(-1.0, ['e1(i,a)', 'v'], ['t1', 't2'])
+    pq.simplify()
+    return pq
 
 
 def build_singles_singles():
@@ -101,7 +130,7 @@ def cli() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--block',
-        choices=['ss', 'sd', 'ds', 'dd',],
+        choices=['zs', 'sz', 'ss', 'sd', 'ds', 'dd',],
         default='ss',
         help='Chose the block of the matrix: s stands for singles and d for'
         ' doubles.',
@@ -127,6 +156,8 @@ def main():
         print_banner()
 
     build_functions = {
+        'zs': build_zero_singles,
+        'sz': build_singles_zero,
         'ss': build_singles_singles,
         'ds': build_doubles_singles,
         'sd': build_singles_doubles,
@@ -142,7 +173,7 @@ def main():
         numpy_print(pq)
 
     elif args.graph is True:
-        graph_print(pq, analysis=args.analysis)
+        graph_print(pq, block=args.block,  analysis=args.analysis)
 
 
 
