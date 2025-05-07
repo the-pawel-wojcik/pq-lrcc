@@ -17,10 +17,13 @@ if False:
         print(term)
     
 if True:
-    options = {}
+    options = {
+        'permute_eri': False,
+    }
     graph = pdaggerq.pq_graph(options)
 
-    graph.add(pq, "E_CC", ['a', 'b', 'i', 'j'])
+    # graph.add(pq, "E_CC", ['a', 'b', 'i', 'j'])
+    graph.add(pq, "E_CC", [])
     graph.optimize()
 
     graph.print('c++')
