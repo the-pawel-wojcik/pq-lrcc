@@ -18,7 +18,7 @@ if False:
     
 if True:
     options = {
-        'permute_eri': False,
+        'permute_eri': True,
     }
     graph = pdaggerq.pq_graph(options)
 
