@@ -3,7 +3,13 @@ import pdaggerq as rome
 vacuum_type = 'fermi'
 pq = rome.pq_helper(vacuum_type)  # vacuum_type = ‘fermi’/‘true’
 
-# Predefined operatros
+
+# indices convention
+# occupied spin-orbitals: i, j, k, l, m, and n
+# virtual spin-orbitals: a, b, c, d, e, and f
+# general spin-orbitals: s, p, q, r
+
+# Predefined operators
 identity = '1'
 
 cc1 = 't1'  # t^a_i a_a^† a_i
