@@ -1,19 +1,38 @@
 import pdaggerq as rome
 
 vacuum_type = 'fermi'
-pq = pq_helper(vacuum_type) # vacuum_type = ‘fermi’/‘true’
+pq = rome.pq_helper(vacuum_type)  # vacuum_type = ‘fermi’/‘true’
 
-num = 1.0
+# Predefined operatros
+identity = '1'
 
-# arbitrary operators 
+cc1 = 't1'  # t^a_i a_a^† a_i
+cc2 = 't2'  # 1/2 t^ab_ij a_a^† a_b^† a_j a_i
+cc3 = 't3'
+cc4 = 't4'
+
+sub1 = 'e1(p,q)'  # a _p ^† a_q
+sub2 = 'e2(s,p,q,r)'  # a _s ^† a _p ^† a_q a_r
+sub3 = 'e3(t,s,p,q,r,u)'  # a _t ^† a _s ^† a _p ^† a_q a_r a_u
+sub4 = 'e4(v,t,s,p,q,r,u,w)'
+
+f = 'f'  # Fock's operator
+f = 'v'  # fluctuation potential
+
+h = 'h'  # general one-body operator = sum _{pq} h _{pq} a _p ^† a _q
+g = 'g'  # general two-body operator
+
+# arbitrary operators
+virtual_creator = 'a1'
+virtual_annihilator = 'a1*'
+occupied_creator = 'i1'
+occupied_annihilator = 'i1*'
+
 a = 'a1'
 b = 'a2'
 c = 'a3'
 d = 'a4'
 e = 'e1(p,q)'  # one body transition operator = a _p ^† a _q
-f = 'f' # Fock's operator
-g = 'g' # general two-body operator
-h = 'h' # general one-body operator = sum _{pq} h _{pq} a _p ^† a _q
 
 # Products of as many operators as you wish
 ab = [a, b]
@@ -29,6 +48,7 @@ pq.set_left_operators(ab)
 pq.set_right_operators(ab)
 
 
+num = 1.0
 # num * <bra|ab|ket>
 pq.add_operator_product(num, ab)
 
