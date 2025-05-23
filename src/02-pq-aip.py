@@ -66,7 +66,7 @@ pq.add_double_commutator(num, ab, cd, ef)
 
 pq.add_triple_commutator(num, ab, cd, ef, gh)
 pq.add_quadruple_commutator(num, ab, cd, ef, gh, prod)
-pq.add_st_operator(num, ab, cd)
+pq.add_st_operator(num, ab, ['t1', 't2'])
 
 pq.print()
 
