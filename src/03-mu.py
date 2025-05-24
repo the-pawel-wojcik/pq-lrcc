@@ -5,22 +5,27 @@ from pdaggerq.algebra import TensorTerm
 pq = pdaggerq.pq_helper('fermi')
 
 # Let's pretend that h is the untouched mu
-# pq.add_operator_product(1.0, ['a*(i)', 'a(a)', 'h'])
+pq.add_operator_product(1.0, ['a*(i)', 'a(a)', 'h'])
+pq.add_operator_product(-1.0, ['h', 'a*(a)', 'a(i)'])
 
 # Let's pretend that h is the untouched mu
-pq.add_st_operator(1.0, ['a*(i)', 'a(a)', 'h'], ['t1', 't2'])
+# pq.add_st_operator(1.0, ['a*(i)', 'a(a)', 'h'], ['t1', 't2'])
 pq.simplify()
 
 strings = pq.strings()
 print('Strings:')
-print(f'{strings}')
+padding = '  '
+for string in strings:
+    print(f'{padding}{string}')
 print()
 
 tensor_terms: list[TensorTerm] = contracted_strings_to_tensor_terms(strings)
 print('Tensor terms:')
-print(f'{tensor_terms=}')
+for term in tensor_terms:
+    print(f'{padding}{term=}')
 print()
 
+print('Numpy terms:')
 for my_term in tensor_terms:
     einsum_terms = my_term.einsum_string(
         output_variables=('i', 'a'),
