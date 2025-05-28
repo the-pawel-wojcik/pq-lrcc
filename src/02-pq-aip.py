@@ -77,9 +77,20 @@ pq.add_triple_commutator(num, ab, cd, ef, gh)
 pq.add_quadruple_commutator(num, ab, cd, ef, gh, prod)
 pq.add_st_operator(num, ab, ['t1', 't2'])
 
-pq.print()
 
+""" Printing """
+# pq.print()  # seem like it's deprecated in the newer version
+# pq.print_fully_contracted()  # also look like it's gone
+# strings = pq.fully_contracted_strings()  # also looks like it's gone
 strings = pq.strings()
 pq.simplify()
-pq.print_fully_contracted()
-strings = pq.fully_contracted_strings()
+
+from pdaggerq.parser import contracted_strings_to_tensor_terms
+from pdaggerq.algebra import TensorTerm
+tensor_terms: list[TensorTerm] = contracted_strings_to_tensor_terms(strings)
+for term in tensor_terms:
+    einsum_terms = term.einsum_string(
+        output_variables=('a', 'i'),
+        update_val='matrix_name',
+    )
+    print(f"{einsum_terms}")
