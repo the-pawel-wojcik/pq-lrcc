@@ -56,11 +56,11 @@ ef = [e, f]
 gh = [g, h]
 prod = ['a7', 'a9']
 
-# <bra| = <0|(a + b)
-pq.set_left_operators(ab)
+# <bra| = <0|(ab + cd)
+pq.set_left_operators([ab, cd])
 
-# |ket> = (a + b)|0>
-pq.set_right_operators(ab)
+# |ket> = (ab + cd)|0>
+pq.set_right_operators([ab, cd])
 
 
 num = 1.0
