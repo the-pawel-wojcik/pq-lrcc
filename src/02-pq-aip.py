@@ -13,9 +13,16 @@ pq = rome.pq_helper(vacuum_type)  # vacuum_type = ‘fermi’/‘true’
 identity = '1'
 
 cc1 = 't1'  # t^a_i a_a^† a_i
-cc2 = 't2'  # 1/2 t^ab_ij a_a^† a_b^† a_j a_i
+cc2 = 't2'  # 1/(2!)**2 t^ab_ij a_a^† a_b^† a_j a_i
 cc3 = 't3'
 cc4 = 't4'
+
+# CC lambda equations helpers
+l0 = 'l0'  # A single scalar value $l_0$
+l1 = 'l1'  # l_a^i a_i^† a_a
+l2 = 'l2'  # 1/(2!)**2 l_{ab}^{ij} a_i^† a_j^† a_b a_a
+l3 = 'l3'
+l4 = 'l4'
 
 sub1 = 'e1(p,q)'  # a _p ^† a_q
 sub2 = 'e2(s,p,q,r)'  # a _s ^† a _p ^† a_q a_r
@@ -27,6 +34,8 @@ f = 'v'  # fluctuation potential
 
 h = 'h'  # general one-body operator = sum _{pq} h _{pq} a _p ^† a _q
 g = 'g'  # general two-body operator
+
+id = '1'  # identity operator, often listed as a variable kd (Kroneker delta)
 
 # arbitrary operators
 virtual_creator = 'a1'
